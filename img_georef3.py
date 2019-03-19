@@ -4,7 +4,6 @@ try:
     from osgeo import ogr, osr, gdal
     from wand.display import display
     from wand.image import Image
-    #from wand.display import display
 except:
     sys.exit('ERROR: cannot find GDAL/OGR and/or Wand modules')
 
@@ -15,6 +14,8 @@ print("#####  The script is written in Python 3.5.1        #####")
 print("#####  by Nate Currit, currit@txstate.edu           #####")
 print("#########################################################")
 print()
+
+path_to_images = "/home/nate/Documents/Research/Guatemala/photos/2015/PNLT/"
 
 # http://spatialreference.org/ref/sr-org/6866/, epsg.io doesn't define it.
 wkt_as_html = 'PROJCS["GTM",\
@@ -68,8 +69,8 @@ def img_georef(argv):
         print('You must supply the name of a .csv file with 3 fields: photograph filename, x coordinate of photo center , y coordinate of photo center')
         return -1
 
-    if not os.path.exists('./outputWithArea'):
-        os.makedirs('./outputWithArea')
+    if not os.path.exists(path_to_images + 'output2019.03.18'):
+        os.makedirs(path_to_images + 'output2019.03.18')
 
     first_photo = True
     with open(argv[1], "r") as photo_list:
@@ -84,7 +85,6 @@ def img_georef(argv):
             p = photo[0]
             Cx = float(photo[1])
             Cy = float(photo[2])
-            # print("Leido...x_resolution is: " + photo[8] + " and y_resolution is: " + photo[8])
             x_half_dist = half(crop_width) * float(photo[8])
             y_half_dist = half(crop_height) * float(photo[8])
             diagonal_length = sqrt(x_half_dist**2 + y_half_dist**2) # diagonal distance to upper right-hand corner of photo
@@ -103,7 +103,6 @@ def img_georef(argv):
             Py = Cy
             
             print("Completed " + str(photo_num) + " of " + str(photo_count) + "\r", end='')
-            # print("Completed " + str(photo_num) + " of " + str(photo_count))
             photo_num += 1
         print()
 
@@ -133,12 +132,12 @@ def clip_georeference(photo, center_x, center_y, prev_x, prev_y):
 
     total_rotation = flight_rotation + radians(rotation)
 
-    with Image(filename=photo) as img:
+    with Image(filename=path_to_images + photo) as img:
         with img.clone() as i:
             i.crop(width=crop_width, height=crop_height, gravity='center')
             i.rotate(degrees(total_rotation))
             i.format = 'tif'
-            output_name = './outputWithArea/new_' + os.path.splitext(photo)[0] + '.tif'
+            output_name = path_to_images + 'output2019.03.18/new_' + os.path.splitext(photo)[0] + '.tif'
             i.save(filename=output_name)
 
             Ax = sin(a_angle + total_rotation) * diagonal_length # X coordinate of upper right hand coordinate after rotation
