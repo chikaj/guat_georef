@@ -1,5 +1,6 @@
 import sys, os, csv, linecache
 from math import atan, cos, sin, radians, sqrt, degrees
+from tqdm import tqdm
 try:
     from osgeo import ogr, osr, gdal
     from wand.display import display
@@ -62,7 +63,8 @@ a_angle = atan(x_half_dist / y_half_dist) # angle to upper right-hand corner of 
 b_angle = radians(180) - a_angle # angle to lower right-hand corner of photo, measured from 0 degrees (ie., "north")
 # diagonal_length = 0 # diagonal distance to upper right-hand corner of photo
 # a_angle = 0 # angle to upper right-hand corner of photo, measured from 0 degrees (ie., "north")
-# b_angle = 0 # angle to 
+# b_angle = 0 # angle to
+
 
 def img_georef(argv):
     if len(argv) <2:
@@ -81,7 +83,7 @@ def img_georef(argv):
         photo_list.seek(0)
 
         photos = csv.reader(photo_list, delimiter=",")
-        for photo in photos:
+        for photo in tqdm(photos):
             p = photo[0]
             Cx = float(photo[1])
             Cy = float(photo[2])
@@ -102,7 +104,7 @@ def img_georef(argv):
             Px = Cx
             Py = Cy
             
-            print("Completed " + str(photo_num) + " of " + str(photo_count) + "\r", end='')
+#            print(("Completed " + str(photo_num) + " of " + str(photo_count)), end="\r")
             photo_num += 1
         print()
 
@@ -170,4 +172,4 @@ def main():
     return img_georef(sys.argv)
 
 if __name__ == '__main__':
-    sys.exit(img_georef(sys.argv))
+    img_georef(sys.argv)
